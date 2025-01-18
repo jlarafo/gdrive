@@ -2,19 +2,24 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const { google } = require('googleapis');
+require('dotenv').config(); // Cargar variables desde el archivo .env
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Usar el puerto definido en .env o 3000 por defecto
 
 // Configuración para manejar subida de archivos usando multer
 const upload = multer({ dest: 'uploads/' }); // Almacena los archivos subidos en la carpeta 'uploads'
 
-const GOOGLE_API_FOLDER_ID = '1gM0YIHco7pfChQmvUD-4dvLt6UdwgGLp';
+// ID de la carpeta en Google Drive
+const GOOGLE_API_FOLDER_ID = process.env.GOOGLE_API_FOLDER_ID;
 
 async function uploadFileToGoogleDrive(filePath, fileName) {
     try {
+        // Autenticación usando credenciales en formato JSON desde la variable de entorno
+        const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+
         const auth = new google.auth.GoogleAuth({
-            keyFile: './googlekey.json', // Cambia esto si tu clave está en otra ubicación
+            credentials: credentials,
             scopes: ['https://www.googleapis.com/auth/drive'],
         });
 
